@@ -330,8 +330,8 @@
             <h3 id="res-username" style="font-size: 1.5rem; margin-bottom: 0.5rem;">@username</h3>
 
             <div class="actions">
-                <a href="#" id="view-link" target="_blank" class="action-link">Original URL</a>
-                <a href="#" id="download-anchor" class="action-link primary-action" download>Save Image</a>
+                <a href="#" id="download-anchor" class="action-link primary-action" download style="width: 100%;">Save
+                    Image</a>
             </div>
         </div>
     </div>
@@ -346,7 +346,6 @@
         const resUsername = document.getElementById('res-username');
         const resBadge = document.getElementById('res-badge');
         const downloadAnchor = document.getElementById('download-anchor');
-        const viewLink = document.getElementById('view-link');
 
 
         downloadBtn.addEventListener('click', async () => {
@@ -379,7 +378,6 @@
                     // For download: use base64 data URL or file path
                     downloadAnchor.href = data.image_data || `/downloads/${data.filename}`;
                     downloadAnchor.download = `${data.username}_pinterest_hd.jpg`;
-                    viewLink.href = data.url;
 
                     resultDiv.style.display = 'block';
                     resultDiv.scrollIntoView({ behavior: 'smooth' });

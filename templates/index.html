@@ -369,12 +369,15 @@
                 const data = await response.json();
 
                 if (data.status === 'success') {
-                    profileImg.src = `/downloads/${data.filename}?t=${new Date().getTime()}`;
+                    // Use base64 data URL if available (Vercel), else fall back to file path (local dev)
+                    const imgSrc = data.image_data || `/downloads/${data.filename}?t=${new Date().getTime()}`;
+                    profileImg.src = imgSrc;
                     resUsername.innerText = `@${data.username}`;
                     resBadge.innerText = data.resolution === 'hd' ? 'Full HD Quality' : 'Standard Quality';
                     resBadge.style.color = data.resolution === 'hd' ? '#10b981' : '#f59e0b';
 
-                    downloadAnchor.href = `/downloads/${data.filename}`;
+                    // For download: use base64 data URL or file path
+                    downloadAnchor.href = data.image_data || `/downloads/${data.filename}`;
                     downloadAnchor.download = `${data.username}_pinterest_hd.jpg`;
                     viewLink.href = data.url;
 
@@ -397,10 +400,6 @@
             if (e.key === 'Enter') downloadBtn.click();
         });
     </script>
-</body>
-
-</html>
-
 </body>
 
 </html>

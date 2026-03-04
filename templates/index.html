@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinterest HD Profiler</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pinterest: #E60023;
+
+            --primary: var(--pinterest);
+            --primary-hover: #bd081c;
+            --bg-dark: #0f172a;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 20% 20%, rgba(230, 0, 35, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.05) 0%, transparent 40%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            transition: background-image 0.5s ease;
+        }
+
+
+
+        .container {
+            max-width: 500px;
+            width: 90%;
+            padding: 2.5rem;
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 32px;
+            box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.6);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .platform-selector {
+            display: flex;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px;
+            border-radius: 18px;
+            margin-bottom: 2rem;
+            gap: 4px;
+        }
+
+        .platform-tab {
+            flex: 1;
+            padding: 0.8rem;
+            text-align: center;
+            border-radius: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            color: var(--text-muted);
+        }
+
+        .platform-tab:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .platform-tab.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .platform-tab.active[data-platform="pinterest"] {
+            background: var(--pinterest);
+        }
+
+        .platform-tab.active[data-platform="instagram"] {
+            background: var(--instagram);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            letter-spacing: -0.02em;
+        }
+
+        h1 span {
+            color: var(--primary);
+            transition: color 0.3s ease;
+        }
+
+        p.subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 1.1rem 1.4rem;
+            border-radius: 18px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.3);
+            color: var(--text-light);
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.05);
+        }
+
+        button {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: 18px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+            filter: brightness(1.1);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #444 !important;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .loading {
+            display: none;
+            margin: 2rem auto;
+            text-align: center;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--glass-border);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        #result {
+            display: none;
+            margin-top: 2rem;
+            text-align: center;
+            animation: slideUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .profile-pic-container {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 1.5rem;
+            border-radius: 50%;
+            padding: 6px;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            transition: background 0.3s ease;
+        }
+
+        .profile-pic {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #1e293b;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .error-message {
+            color: #f87171;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 1.25rem;
+            border-radius: 16px;
+            margin-top: 1.5rem;
+            display: none;
+            font-size: 0.95rem;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .action-link {
+            flex: 1;
+            padding: 0.9rem;
+            border-radius: 14px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            border: 1px solid var(--glass-border);
+        }
+
+        .action-link:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .primary-action {
+            background: var(--primary) !important;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="main-container">
+        <h1>Pinterest <span>Profiler</span></h1>
+        <p class="subtitle">Extract high-definition Pinterest profile pictures.</p>
+
+
+
+        <div class="input-group">
+            <input type="text" id="username" placeholder="Enter Pinterest username or URL..." autocomplete="off">
+        </div>
+
+        <button id="download-btn">
+            <span id="btn-text">Get Profile Picture</span>
+        </button>
+
+        <div class="loading" id="loading">
+            <div class="spinner" id="spinner"></div>
+            <p id="loading-msg">Fetching high-res data...</p>
+        </div>
+
+        <div id="error" class="error-message"></div>
+
+        <div id="result">
+            <div class="badge" id="res-badge">HD Resolution</div>
+            <div class="profile-pic-container" id="pic-frame">
+                <img src="" alt="Profile Picture" class="profile-pic" id="profile-img">
+            </div>
+            <h3 id="res-username" style="font-size: 1.5rem; margin-bottom: 0.5rem;">@username</h3>
+
+            <div class="actions">
+                <a href="#" id="view-link" target="_blank" class="action-link">Original URL</a>
+                <a href="#" id="download-anchor" class="action-link primary-action" download>Save Image</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const downloadBtn = document.getElementById('download-btn');
+        const usernameInput = document.getElementById('username');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const resultDiv = document.getElementById('result');
+        const profileImg = document.getElementById('profile-img');
+        const resUsername = document.getElementById('res-username');
+        const resBadge = document.getElementById('res-badge');
+        const downloadAnchor = document.getElementById('download-anchor');
+        const viewLink = document.getElementById('view-link');
+
+
+        downloadBtn.addEventListener('click', async () => {
+            const username = usernameInput.value.trim();
+            if (!username) return;
+
+            // Reset UI
+            errorDiv.style.display = 'none';
+            resultDiv.style.display = 'none';
+            loadingDiv.style.display = 'block';
+            downloadBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    profileImg.src = `/downloads/${data.filename}?t=${new Date().getTime()}`;
+                    resUsername.innerText = `@${data.username}`;
+                    resBadge.innerText = data.resolution === 'hd' ? 'Full HD Quality' : 'Standard Quality';
+                    resBadge.style.color = data.resolution === 'hd' ? '#10b981' : '#f59e0b';
+
+                    downloadAnchor.href = `/downloads/${data.filename}`;
+                    downloadAnchor.download = `${data.username}_pinterest_hd.jpg`;
+                    viewLink.href = data.url;
+
+                    resultDiv.style.display = 'block';
+                    resultDiv.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    errorDiv.innerText = data.message || 'Error processing request.';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.innerText = 'Network error. Please try again.';
+                errorDiv.style.display = 'block';
+            } finally {
+                loadingDiv.style.display = 'none';
+                downloadBtn.disabled = false;
+            }
+        });
+
+        usernameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') downloadBtn.click();
+        });
+    </script>
+</body>
+
+</html>
+
+</body>
+
+</html>
